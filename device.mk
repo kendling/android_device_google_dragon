@@ -21,18 +21,11 @@ ifeq ($(wildcard vendor/nvidia/dragon-tlk/tlk),vendor/nvidia/dragon-tlk/tlk)
     SECURE_OS_BUILD ?= tlk
 endif
 
-ifeq ($(TARGET_PREBUILT_KERNEL),)
-LOCAL_KERNEL := device/google/dragon-kernel/Image.fit
-else
-LOCAL_KERNEL := $(TARGET_PREBUILT_KERNEL)
-endif
-
 LOCAL_FSTAB := $(LOCAL_PATH)/fstab.dragon
 
 TARGET_RECOVERY_FSTAB = $(LOCAL_FSTAB)
 
 PRODUCT_COPY_FILES := \
-    $(LOCAL_KERNEL):kernel \
     $(LOCAL_PATH)/dump_bq25892.sh:system/bin/dump_bq25892.sh \
     $(LOCAL_PATH)/touchfwup.sh:system/bin/touchfwup.sh \
     $(LOCAL_PATH)/init.dragon.rc:root/init.dragon.rc \
@@ -58,7 +51,7 @@ PRODUCT_PACKAGES += \
     CrashReportProvider \
     fwtool
 
-ifeq ($(TARGET_BUILD_VARIANT),eng)
+ifeq ($(TARGET_BUILD_VARIANT),userdebug)
 PRODUCT_PACKAGES += \
     tinyplay \
     tinycap \
@@ -157,9 +150,12 @@ PRODUCT_SYSTEM_PROPERTY_BLACKLIST := \
 $(call inherit-product, frameworks/native/build/tablet-10in-xhdpi-2048-dalvik-heap.mk)
 
 # set default USB configuration
+# ro.secure=0 for fixed can't bootup problem (boot with 'OS on your tablet is damaged. Need recovery.' message)
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
-    persist.sys.usb.config=mtp \
-    ro.adb.secure=1 \
+    sys.usb.config=mtp,adb \
+    persist.sys.usb.config=mtp,adb \
+    ro.secure=0 \
+    ro.adb.secure=0 \
     ro.sf.lcd_density=320 \
     ro.opengles.version=196609
 
@@ -177,8 +173,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
     ro.frp.pst=/dev/block/platform/700b0600.sdhci/by-name/PST
 
 # for keyboard key mappings
-PRODUCT_PACKAGES += \
-    DragonKeyboard
+#PRODUCT_PACKAGES += \
+#    DragonKeyboard
 
 # Allows healthd to boot directly from charger mode rather than initiating a reboot.
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
@@ -188,6 +184,7 @@ PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
 
 $(call inherit-product, build/target/product/vboot.mk)
 $(call inherit-product, build/target/product/verity.mk)
+
 # including verity.mk automatically enabled boot signer which conflicts with
 # vboot
 PRODUCT_SUPPORTS_BOOT_SIGNER := false
@@ -195,7 +192,7 @@ PRODUCT_SYSTEM_VERITY_PARTITION := /dev/block/platform/700b0600.sdhci/by-name/AP
 PRODUCT_VENDOR_VERITY_PARTITION := /dev/block/platform/700b0600.sdhci/by-name/VNR
 
 $(call inherit-product-if-exists, hardware/nvidia/tegra132/tegra132.mk)
-$(call inherit-product-if-exists, vendor/google_devices/dragon/device-vendor.mk)
+$(call inherit-product-if-exists, vendor/nvidia/dragon/device-vendor.mk)
 $(call inherit-product-if-exists, hardware/broadcom/wlan/bcmdhd/config/config-bcm.mk)
 
 ENABLE_LIBDRM := true
@@ -206,5 +203,3 @@ PRODUCT_PACKAGES += \
     libdrm \
     rmi4update \
     rmihidtool
-
-$(call inherit-product-if-exists, vendor/nvidia/dragon/dragon-vendor.mk)
