@@ -24,6 +24,7 @@ endif
 LOCAL_FSTAB := $(LOCAL_PATH)/fstab.dragon
 
 TARGET_RECOVERY_FSTAB = $(LOCAL_FSTAB)
+TWRP_FSTAB := $(LOCAL_PATH)/twrp.fstab
 
 PRODUCT_COPY_FILES := \
     $(LOCAL_PATH)/dump_bq25892.sh:system/bin/dump_bq25892.sh \
@@ -37,7 +38,8 @@ PRODUCT_COPY_FILES := \
     $(LOCAL_PATH)/ueventd.dragon.rc:root/ueventd.dragon.rc \
     $(LOCAL_PATH)/speakerdsp.ini:system/etc/cras/speakerdsp.ini \
     $(LOCAL_PATH)/bcmdhd.cal:system/etc/wifi/bcmdhd.cal \
-    $(LOCAL_PATH)/com.nvidia.nvsi.xml:system/etc/permissions/com.nvidia.nvsi.xml
+    $(LOCAL_PATH)/com.nvidia.nvsi.xml:system/etc/permissions/com.nvidia.nvsi.xml \
+    $(TWRP_FSTAB):recovery/root/etc/twrp.fstab
 
 PRODUCT_PACKAGES += \
     libwpa_client \
